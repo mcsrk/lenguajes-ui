@@ -10,10 +10,11 @@ function App() {
   const [resultText, setResultText] = useState("");
   const onChange = (e) => {
     console.log("Change:", e.target.value);
+    setInputText(e.target.value);
   };
 
   const translateText = () => {
-    setResultText(inputText);
+    setInputText(inputText);
 
     let config = {
       method: "post",
@@ -21,9 +22,18 @@ function App() {
       headers: { "Content-Type": "text/plain" },
       data: inputText,
     };
-    axios(config).then((response) => {
-      setResultText(response.data.translatedText);
-    });
+    if (inputText !== "") {
+      axios(config)
+        .then((response) => {
+          setResultText(response.data.translatedText);
+        })
+        .catch((error) => {
+          console.log({ error });
+          setResultText(error.message);
+        });
+    } else {
+      setResultText("Ingrese un comando para traducir");
+    }
   };
   return (
     <div>
@@ -36,6 +46,7 @@ function App() {
           <Form>
             <TextArea
               showCount
+              value={inputText}
               placeholder="Comando(s) a traducir ..."
               onChange={onChange}
             />
